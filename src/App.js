@@ -15,7 +15,8 @@ class App extends Component  {
   constructor(props) {
     super(props);
     this.state = {
-      buffer:null
+      buffer:null,
+      memeHash:'QmZWjCioYu3j7ShgBentwprJ6ttDmjnVyKPUGL4QfVnL8P'
     };
   }
 
@@ -40,7 +41,9 @@ class App extends Component  {
     console.log('Submittig the form');
     console.log(this.state.buffer)
     const fileupload = await ipfs.add(this.state.buffer)
-    console.log(fileupload)
+
+    console.log(fileupload.path)
+    this.setState({memeHash:fileupload.path})
 
     //Step 2 is to store the fie onthe blockchian
   }
@@ -51,7 +54,7 @@ render () {
   return (
     <div className="App">
       <Navbar />
-      <img className =" ml-auto mr-auto img-fluid" src="https://www.insidehighered.com/sites/default/server_files/media/iStock-892082986.jpg "  />
+      <img className =" ml-auto mr-auto img-fluid" src={`https://ipfs.io/ipfs/${this.state.memeHash}`}  />
       <br />
       <p></p>
       <h1> IPFS Images Upload</h1>
