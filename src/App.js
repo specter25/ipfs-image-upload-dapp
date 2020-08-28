@@ -1,7 +1,8 @@
 import React , {Component} from 'react';
-import logo from './logo.svg';
+import Web3 from 'web3'
 import './App.css'
 import Navbar from './components/Navbar'
+import Meme from './abis/Meme.json'
 
 
 const ipfsClient = require('ipfs-http-client')
@@ -16,8 +17,49 @@ class App extends Component  {
     super(props);
     this.state = {
       buffer:null,
-      memeHash:'QmZWjCioYu3j7ShgBentwprJ6ttDmjnVyKPUGL4QfVnL8P'
+      memeHash:'QmZWjCioYu3j7ShgBentwprJ6ttDmjnVyKPUGL4QfVnL8P',
+      account:''
     };
+  }
+  async componentDidMount() {
+    await this.loadWeb3()
+    await this.loadBlockchainData()
+  }
+
+  async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+  }
+  async loadBlockchainData() {
+    const web3=window.web3 ;
+    //load accounts
+     const accounts = await web3.eth.getAccounts()
+     console.log(accounts[0])
+     this.setState({account:accounts[0]}) 
+     
+     const networkId = await web3.eth.net.getId() 
+     const networkData = Meme.networks[networkId]
+
+     if(networkData)
+     {
+      const abi = Meme.abi
+      const meme = new  web3.eth.Contract(abi,networkData.address )
+      
+     }
+     else {
+      window.alert('meme contract not deployed to the public network')
+     }
+
+
+     
   }
 
   captureFile = (e) =>{
@@ -53,7 +95,7 @@ class App extends Component  {
 render () {
   return (
     <div className="App">
-      <Navbar />
+      <Navbar account={this.state.account} />
       <img className =" ml-auto mr-auto img-fluid" src={`https://ipfs.io/ipfs/${this.state.memeHash}`}  />
       <br />
       <p></p>
