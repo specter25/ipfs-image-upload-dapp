@@ -52,7 +52,10 @@ class App extends Component  {
      {
       const abi = Meme.abi
       const meme = new  web3.eth.Contract(abi,networkData.address )
-      
+      this.setState({meme})
+
+      const memeHash = await meme.methods.get().call()
+      this.setState({memeHash})
      }
      else {
       window.alert('meme contract not deployed to the public network')
@@ -83,9 +86,12 @@ class App extends Component  {
     console.log('Submittig the form');
     console.log(this.state.buffer)
     const fileupload = await ipfs.add(this.state.buffer)
-
     console.log(fileupload.path)
-    this.setState({memeHash:fileupload.path})
+    await this.state.meme.methods.set(fileupload.path).send({from: this.state.account}).then(r =>{
+      console.log('data being stored in the blockchian')
+      this.setState({memeHash:fileupload.path})
+    })
+
 
     //Step 2 is to store the fie onthe blockchian
   }
